@@ -56,7 +56,7 @@ router.all('/*', (req, res, next) => {
     })
     .catch(error => {
       const { response } = error || {}
-      resData = response?.data || 'All is fucked!'
+      resData = response?.data || { logref: 'All is fucked!' }
       resHeaders = response?.headers || {}
       resStatus = response?.status || 500
     })
