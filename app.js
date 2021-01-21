@@ -11,6 +11,8 @@ const indexRouter = require('./routes/index')
 const upload = multer()
 const app = express()
 
+app.disable('etag')
+
 app.use(logger('dev'))
 app.use(express.json())
 app.use(express.urlencoded({ extended: false }))
