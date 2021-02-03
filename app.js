@@ -11,6 +11,9 @@ const indexRouter = require('./routes/index')
 const upload = multer()
 const app = express()
 
+// need to add in case of self-signed certificate connection
+process.env.NODE_TLS_REJECT_UNAUTHORIZED = 0
+
 app.disable('etag')
 
 app.use(logger('dev'))
