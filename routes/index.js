@@ -10,7 +10,9 @@ const getLength = formData =>
 const router = express.Router()
 
 router.all('/*', (req, res, next) => {
-  const { body, headers: reqHeaders, method, query, url } = req
+  const { body, headers: reqHeaders, method, query, url: reqUrl } = req
+
+  const url = reqUrl.replace(/\?.*/, '')
 
   const headers = { ...(reqHeaders || {}) }
 
@@ -43,7 +45,7 @@ router.all('/*', (req, res, next) => {
         headers['content-length'] = contentLength
       }
 
-      const props = { data, headers, method, params: query, url }
+      const props = { data, headers, method, params: method === 'get' ? data : query, url }
 
       console.log(props)
 
