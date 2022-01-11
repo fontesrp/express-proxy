@@ -1,14 +1,62 @@
 const axios = require('axios')
 const express = require('express')
 const FormData = require('form-data')
+const fs = require('fs')
+const os = require('os')
+const path = require('path')
 
 const getLength = formData =>
   new Promise((resolve, reject) =>
     formData.getLength((err, length) => (err ? reject(err) : resolve(length)))
   )
 
+// eslint-disable-next-line new-cap
 const router = express.Router()
 
+// eslint-disable-next-line no-unused-vars
+router.post('/video', (req, res, next) => {
+  const { body, headers: reqHeaders, method, query, url: reqUrl } = req
+
+  console.log('method', method)
+  console.log('headers', reqHeaders)
+  console.log('query', query)
+  console.log('reqUrl', reqUrl)
+  console.log('body', body)
+  console.log('***************')
+
+  const videosfolder = path.join(os.homedir(), 'Downloads', 'test_video')
+
+  fs.mkdir(videosfolder, { recursive: true }, mkdirError => {
+    if (mkdirError) {
+      return console.error('mkdir error', mkdirError)
+    }
+
+    fs.readdir(videosfolder, { withFileTypes: true }, (readdirError, files) => {
+      if (readdirError) {
+        return console.error('readdir error', readdirError)
+      }
+
+      const latestPart = files.reduce((max, file) => {
+        const part = file.name.replace(/.*(\d)\.part$/, '$1')
+        return Math.max(max, Number(part) || 0)
+      }, 0)
+
+      const partNumber = query?.part || latestPart + 1
+      const filepath = path.join(videosfolder, `movie_${partNumber}.part`)
+
+      fs.writeFile(
+        filepath,
+        body,
+        'binary',
+        writeError => writeError && console.error('writeFile error', writeError)
+      )
+    })
+  })
+
+  res.status(203).send('success')
+})
+
+// eslint-disable-next-line no-unused-vars
 router.all('/*', (req, res, next) => {
   const { body, headers: reqHeaders, method, query, url: reqUrl } = req
 

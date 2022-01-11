@@ -20,3 +20,5 @@ axios.defaults.headers.common.Accept = 'application/json'
 axios.defaults.paramsSerializer = params =>
   qs.stringify(params, { arrayFormat: 'comma', encode: false })
 axios.defaults.timeout = 30000
+
+module.exports = { log, warn }

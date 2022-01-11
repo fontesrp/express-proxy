@@ -1,7 +1,8 @@
 // Run with: URL=https://my.proxied.url.com yarn start
 
-const express = require('express')
+const bodyParser = require('body-parser')
 const cookieParser = require('cookie-parser')
+const express = require('express')
 const logger = require('morgan')
 const multer = require('multer')
 
@@ -17,7 +18,8 @@ process.env.NODE_TLS_REJECT_UNAUTHORIZED = 0
 app.disable('etag')
 
 app.use(logger('dev'))
-app.use(express.json({ limit: '50MB' }))
+app.use(bodyParser.raw({ limit: '500MB' }))
+app.use(express.json({ limit: '500MB' }))
 app.use(express.urlencoded({ extended: false }))
 app.use(cookieParser())
 
@@ -26,8 +28,10 @@ app.use(upload.array())
 
 app.use('/', indexRouter)
 
+// eslint-disable-next-line no-unused-vars
 app.use((req, res) => res.status(404).send({ pageName: 'not-found' }))
 
+// eslint-disable-next-line no-unused-vars
 app.use((err, req, res, next) =>
   res.status(500).send({ error: err?.message, logref: 'internal-server-error' })
 )
