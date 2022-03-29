@@ -5,6 +5,7 @@
   "scripts": {
     "clean": "./bin/scripts clean",
     "pre-commit-script": "./bin/scripts pre-commit",
+    "prepare": "husky install",
     "start": "DEBUG=express-proxy:* nodemon ./bin/www"
   },
   "dependencies": {
@@ -20,7 +21,7 @@
     "qs": "^6.9.4"
   },
   "devDependencies": {
-    "husky": "^4.3.6",
+    "husky": "^7.0.4",
     "prettier": "^2.2.1",
     "pretty-quick": "^3.1.3"
   },
