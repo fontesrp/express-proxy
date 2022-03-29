@@ -3,8 +3,8 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "clean": "./scripts.sh clean",
-    "pre-commit-script": "./scripts.sh pre-commit",
+    "clean": "./bin/scripts clean",
+    "pre-commit-script": "./bin/scripts pre-commit",
     "start": "DEBUG=express-proxy:* nodemon ./bin/www"
   },
   "dependencies": {
