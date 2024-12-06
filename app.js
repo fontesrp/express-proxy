@@ -17,9 +17,10 @@ process.env.NODE_TLS_REJECT_UNAUTHORIZED = 0
 
 app.disable('etag')
 
+const tenGB = 10 * 1024 * 1024 * 1024
 app.use(logger('dev'))
-app.use(bodyParser.raw({ limit: '500MB' }))
-app.use(express.json({ limit: '500MB' }))
+app.use(bodyParser.raw({ limit: tenGB }))
+app.use(express.json({ limit: tenGB }))
 app.use(express.urlencoded({ extended: false }))
 app.use(cookieParser())
 

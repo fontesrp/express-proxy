@@ -14,9 +14,10 @@ const getLength = formData =>
 const router = express.Router()
 
 // eslint-disable-next-line no-unused-vars
-router.post('/video', (req, res, next) => {
+router.put('/media', (req, res, next) => {
   const { body, headers: reqHeaders, method, query, url: reqUrl } = req
 
+  console.log(new Date().toISOString())
   console.log('method', method)
   console.log('headers', reqHeaders)
   console.log('query', query)
@@ -24,43 +25,44 @@ router.post('/video', (req, res, next) => {
   console.log('body', body)
   console.log('***************')
 
-  const videosfolder = path.join(os.homedir(), 'Downloads', 'test_video')
+  const mediaFolder = path.join(os.homedir(), 'Downloads', 'test_media')
 
-  fs.mkdir(videosfolder, { recursive: true }, mkdirError => {
+  fs.mkdir(mediaFolder, { recursive: true }, mkdirError => {
     if (mkdirError) {
       return console.error('mkdir error', mkdirError)
     }
 
-    fs.readdir(videosfolder, { withFileTypes: true }, (readdirError, files) => {
-      if (readdirError) {
-        return console.error('readdir error', readdirError)
-      }
+    const filename = [Date.now(), reqHeaders?.filename].filter(Boolean).join('-')
+    const filepath = path.join(mediaFolder, filename)
 
-      const latestPart = files.reduce((max, file) => {
-        const part = file.name.replace(/.*(\d)\.part$/, '$1')
-        return Math.max(max, Number(part) || 0)
-      }, 0)
-
-      const partNumber = query?.part || latestPart + 1
-      const filepath = path.join(videosfolder, `movie_${partNumber}.part`)
-
-      fs.writeFile(
-        filepath,
-        body,
-        'binary',
-        writeError => writeError && console.error('writeFile error', writeError)
-      )
-    })
+    fs.writeFile(
+      filepath,
+      body,
+      'binary',
+      writeError => writeError && console.error('writeFile error', writeError)
+    )
   })
 
   res.status(203).send('success')
 })
 
-// eslint-disable-next-line no-unused-vars
+router.get('/redirect', (req, res, next) => {
+  res.redirect(
+    'https://app.emocha.com/sign-up?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJwYXRpZW50SWQiOiIxMjM0NTY3ODkwIiwiZmlyc3ROYW1lIjoiUm9zZW1hcnkiLCJpYXQiOjE1MTYyMzkwMjJ9.XIagQEpcXZnqjPM_QyVfjS93POU9mfHyapXC9hiHDFk'
+  )
+})
+
 router.all('/*', (req, res, next) => {
   const { body, headers: reqHeaders, method, query, url: reqUrl } = req
 
-  const url = reqUrl.replace(/\?.*/, '')
+  res.sendFile(path.join('/Users/rfontes/Downloads', 'fingerprint.html'))
+
+  /*const url = reqUrl.replace(/\?.*, '')
+
+  if (!url) {
+    next()
+    return
+  }
 
   const headers = { ...(reqHeaders || {}) }
 
@@ -114,7 +116,7 @@ router.all('/*', (req, res, next) => {
       delete resHeaders['transfer-encoding']
       res.set(resHeaders)
       res.status(resStatus).send(resData)
-    })
+    })*/
 })
 
 module.exports = router
