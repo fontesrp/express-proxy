@@ -52,6 +52,14 @@ router.get('/redirect', (req, res, next) => {
   )
 })
 
+router.get('/manifest.json', (req, res, next) => {
+  res.sendFile(path.join('/Users/rfontes/Downloads', 'manifest.json'))
+})
+
+router.get('/img.png', (req, res, next) => {
+  res.sendFile(path.join('/Users/rfontes/Downloads', 'img.png'))
+})
+
 router.all('/*', (req, res, next) => {
   const { body, headers: reqHeaders, method, query, url: reqUrl } = req
 
