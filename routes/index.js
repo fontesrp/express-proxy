@@ -10,10 +10,8 @@ const getLength = formData =>
     formData.getLength((err, length) => (err ? reject(err) : resolve(length)))
   )
 
-// eslint-disable-next-line new-cap
 const router = express.Router()
 
-// eslint-disable-next-line no-unused-vars
 router.put('/media', (req, res, next) => {
   const { body, headers: reqHeaders, method, query, url: reqUrl } = req
 
@@ -54,6 +52,10 @@ router.get('/redirect', (req, res, next) => {
 
 router.get('/manifest.json', (req, res, next) => {
   res.sendFile(path.join('/Users/rfontes/Downloads', 'manifest.json'))
+})
+
+router.get('/sample', (req, res, next) => {
+  res.sendFile(path.join(__dirname, '../sample.html'))
 })
 
 router.all('/*', (req, res, next) => {
