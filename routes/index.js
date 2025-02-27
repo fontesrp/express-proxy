@@ -56,16 +56,10 @@ router.get('/manifest.json', (req, res, next) => {
   res.sendFile(path.join('/Users/rfontes/Downloads', 'manifest.json'))
 })
 
-router.get('/img.png', (req, res, next) => {
-  res.sendFile(path.join('/Users/rfontes/Downloads', 'img.png'))
-})
-
 router.all('/*', (req, res, next) => {
   const { body, headers: reqHeaders, method, query, url: reqUrl } = req
 
-  res.sendFile(path.join('/Users/rfontes/Downloads', 'fingerprint.html'))
-
-  /*const url = reqUrl.replace(/\?.*, '')
+  const url = reqUrl.replace(/\?.*/, '')
 
   if (!url) {
     next()
@@ -124,7 +118,7 @@ router.all('/*', (req, res, next) => {
       delete resHeaders['transfer-encoding']
       res.set(resHeaders)
       res.status(resStatus).send(resData)
-    })*/
+    })
 })
 
 module.exports = router
