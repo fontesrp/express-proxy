@@ -8,7 +8,7 @@
     "format": "prettier --write \"**/*.{js,mjs,ts,cjs}\"",
     "lint": "eslint . && tsc --noEmit",
     "prepare": "husky",
-    "start": "DEBUG=express-proxy:* nodemon ./bin/www.ts",
+    "start": "DEBUG=express-proxy:* nodemon",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
