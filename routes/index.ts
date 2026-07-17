@@ -1,9 +1,11 @@
 import axios from 'axios'
 import express, { type NextFunction, type Request, type Response } from 'express'
 import FormData from 'form-data'
-import fs from 'fs'
+import fs from 'fs/promises'
 import os from 'os'
 import path from 'path'
+
+import { log, warn } from '../config.ts'
 
 const getLength = (formData: FormData): Promise<number | undefined> =>
   new Promise((resolve, reject) =>
@@ -15,24 +17,14 @@ const router = express.Router()
 router.post('/video', (req: Request, res: Response, _next: NextFunction) => {
   const { body, headers: reqHeaders, method, query, url: reqUrl } = req
 
-  console.log('method', method)
-  console.log('headers', reqHeaders)
-  console.log('query', query)
-  console.log('reqUrl', reqUrl)
-  console.log('body', body)
-  console.log('***************')
+  log('video request', { method, headers: reqHeaders, query, reqUrl })
 
   const videosfolder = path.join(os.homedir(), 'Downloads', 'test_video')
 
-  fs.mkdir(videosfolder, { recursive: true }, mkdirError => {
-    if (mkdirError) {
-      return console.error('mkdir error', mkdirError)
-    }
-
-    fs.readdir(videosfolder, { withFileTypes: true }, (readdirError, files) => {
-      if (readdirError) {
-        return console.error('readdir error', readdirError)
-      }
+  void (async () => {
+    try {
+      await fs.mkdir(videosfolder, { recursive: true })
+      const files = await fs.readdir(videosfolder, { withFileTypes: true })
 
       const latestPart = files.reduce((max, file) => {
         const part = file.name.replace(/.*(\d)\.part$/, '$1')
@@ -42,14 +34,11 @@ router.post('/video', (req: Request, res: Response, _next: NextFunction) => {
       const partNumber = query?.part || latestPart + 1
       const filepath = path.join(videosfolder, `movie_${partNumber}.part`)
 
-      fs.writeFile(
-        filepath,
-        body,
-        'binary',
-        writeError => writeError && console.error('writeFile error', writeError)
-      )
-    })
-  })
+      await fs.writeFile(filepath, body, 'binary')
+    } catch (error) {
+      warn('video write error', error)
+    }
+  })()
 
   res.status(203).send('success')
 })
@@ -96,7 +85,7 @@ router.all('/*splat', (req: Request, res: Response, _next: NextFunction) => {
 
       const props = { data, headers, method, params: method === 'get' ? data : query, url }
 
-      console.log(props)
+      log('proxy request', props)
 
       return axios(props)
     })
