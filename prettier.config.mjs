@@ -1,4 +1,9 @@
-/** @type {import('prettier').Config} */
+/**
+ * Prettier configuration file
+ * https://prettier.io/docs/en/configuration.html
+ *
+ * @type {import("prettier").Config}
+ */
 export default {
   arrowParens: 'avoid',
   bracketSameLine: false,
