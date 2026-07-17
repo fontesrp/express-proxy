@@ -57,7 +57,7 @@ router.post('/video', (req, res, next) => {
 })
 
 // eslint-disable-next-line no-unused-vars
-router.all('/*', (req, res, next) => {
+router.all('/*splat', (req, res, next) => {
   const { body, headers: reqHeaders, method, query, url: reqUrl } = req
 
   const url = reqUrl.replace(/\?.*/, '')
