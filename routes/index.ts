@@ -14,10 +14,20 @@ const getLength = (formData: FormData): Promise<number | undefined> =>
 
 const router = express.Router()
 
-router.post('/video', (req: Request, res: Response, _next: NextFunction) => {
+router.put('/video', (req: Request, res: Response, _next: NextFunction) => {
   const { body, headers: reqHeaders, method, query, url: reqUrl } = req
 
-  log('video request', { method, headers: reqHeaders, query, reqUrl })
+  const declaredSize = Number(reqHeaders['content-length']) || 0
+  const receivedSize = Buffer.isBuffer(body) ? body.length : 0
+
+  log('video request', {
+    method,
+    query,
+    reqUrl,
+    declaredSize,
+    receivedSize,
+    bodyMatch: declaredSize === receivedSize
+  })
 
   const videosfolder = path.join(os.homedir(), 'Downloads', 'test_video')
 
@@ -26,9 +36,10 @@ router.post('/video', (req: Request, res: Response, _next: NextFunction) => {
       await fs.mkdir(videosfolder, { recursive: true })
 
       let partNumber = 0
+      const partFromQuery = Number(query?.part)
 
-      if (Number.isInteger(query?.part)) {
-        partNumber = Number(query.part)
+      if (Number.isInteger(partFromQuery) && partFromQuery > 0) {
+        partNumber = partFromQuery
       } else {
         const files = await fs.readdir(videosfolder, { withFileTypes: true })
 
@@ -42,13 +53,15 @@ router.post('/video', (req: Request, res: Response, _next: NextFunction) => {
 
       const filepath = path.join(videosfolder, `movie_${partNumber}.part`)
 
+      log('video write', { partFromQuery: query?.part, partNumber, filepath, receivedSize })
+
       await fs.writeFile(filepath, body, 'binary')
     } catch (error) {
       warn('video write error', error)
     }
   })()
 
-  res.status(203).send('success')
+  res.status(201).send('success')
 })
 
 router.all('/*splat', (req: Request, res: Response, _next: NextFunction) => {
