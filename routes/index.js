@@ -10,7 +10,6 @@ const getLength = formData =>
     formData.getLength((err, length) => (err ? reject(err) : resolve(length)))
   )
 
-// eslint-disable-next-line new-cap
 const router = express.Router()
 
 // eslint-disable-next-line no-unused-vars

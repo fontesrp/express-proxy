@@ -28,7 +28,6 @@ app.use(upload.array())
 
 app.use('/', indexRouter)
 
-// eslint-disable-next-line no-unused-vars
 app.use((req, res) => res.status(404).send({ pageName: 'not-found' }))
 
 // eslint-disable-next-line no-unused-vars
