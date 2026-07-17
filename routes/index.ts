@@ -24,14 +24,22 @@ router.post('/video', (req: Request, res: Response, _next: NextFunction) => {
   void (async () => {
     try {
       await fs.mkdir(videosfolder, { recursive: true })
-      const files = await fs.readdir(videosfolder, { withFileTypes: true })
 
-      const latestPart = files.reduce((max, file) => {
-        const part = file.name.replace(/.*(\d)\.part$/, '$1')
-        return Math.max(max, Number(part) || 0)
-      }, 0)
+      let partNumber = 0
 
-      const partNumber = query?.part || latestPart + 1
+      if (Number.isInteger(query?.part)) {
+        partNumber = Number(query.part)
+      } else {
+        const files = await fs.readdir(videosfolder, { withFileTypes: true })
+
+        const latestPart = files.reduce((max, file) => {
+          const part = file.name.replace(/.*(\d)\.part$/, '$1')
+          return Math.max(max, Number(part) || 0)
+        }, 0)
+
+        partNumber = latestPart + 1
+      }
+
       const filepath = path.join(videosfolder, `movie_${partNumber}.part`)
 
       await fs.writeFile(filepath, body, 'binary')
