@@ -1,59 +1,38 @@
 #!/usr/bin/env node
 
-/**
- * Module dependencies.
- */
+import debug from 'debug'
+import http from 'http'
 
-const debug = require('debug')('express-proxy:server')
-const http = require('http')
+import app from '../app.ts'
 
-const app = require('../app')
+const debugLog = debug('express-proxy:server')
 
-/**
- * Normalize a port into a number, string, or false.
- */
-
-const normalizePort = val => {
+const normalizePort = (val: string): number | string | false => {
   const portNum = parseInt(val, 10)
 
   if (isNaN(portNum)) {
-    // named pipe
     return val
   }
 
   if (portNum >= 0) {
-    // port number
     return portNum
   }
 
   return false
 }
 
-/**
- * Get port from environment and store in Express.
- */
-
 const port = normalizePort(process.env.PORT || '3000')
 app.set('port', port)
 
-/**
- * Create HTTP server.
- */
-
 const server = http.createServer(app)
 
-/**
- * Event listener for HTTP server "error" event.
- */
-
-const onError = error => {
+const onError = (error: NodeJS.ErrnoException): void => {
   if (error.syscall !== 'listen') {
     throw error
   }
 
   const bind = typeof port === 'string' ? `Pipe ${port}` : `Port ${port}`
 
-  // handle specific listen errors with friendly messages
   switch (error.code) {
     case 'EACCES':
       console.error(bind, 'requires elevated privileges')
@@ -68,19 +47,15 @@ const onError = error => {
   }
 }
 
-/**
- * Event listener for HTTP server "listening" event.
- */
-
-const onListening = () => {
+const onListening = (): void => {
   const addr = server.address()
-  const bind = typeof addr === 'string' ? `pipe ${addr}` : `port ${addr.port}`
-  debug('Listening on', bind)
-}
+  if (!addr) {
+    return
+  }
 
-/**
- * Listen on provided port, on all network interfaces.
- */
+  const bind = typeof addr === 'string' ? `pipe ${addr}` : `port ${addr.port}`
+  debugLog('Listening on', bind)
+}
 
 server.listen(port)
 server.on('error', onError)

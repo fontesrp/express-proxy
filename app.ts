@@ -1,19 +1,19 @@
 // Run with: URL=https://my.proxied.url.com yarn start
 
-const bodyParser = require('body-parser')
-const cookieParser = require('cookie-parser')
-const express = require('express')
-const logger = require('morgan')
-const multer = require('multer')
+import bodyParser from 'body-parser'
+import cookieParser from 'cookie-parser'
+import express from 'express'
+import logger from 'morgan'
+import multer from 'multer'
 
-require('./config')
-const indexRouter = require('./routes/index')
+import './config.ts'
+import indexRouter from './routes/index.ts'
 
 const upload = multer()
 const app = express()
 
 // need to add in case of self-signed certificate connection
-process.env.NODE_TLS_REJECT_UNAUTHORIZED = 0
+process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0'
 
 app.disable('etag')
 
@@ -24,15 +24,14 @@ app.use(express.urlencoded({ extended: false }))
 app.use(cookieParser())
 
 // for parsing multipart/form-data
-app.use(upload.array())
+app.use(upload.any())
 
 app.use('/', indexRouter)
 
-app.use((req, res) => res.status(404).send({ pageName: 'not-found' }))
+app.use((_req, res) => res.status(404).send({ pageName: 'not-found' }))
 
-// eslint-disable-next-line no-unused-vars
-app.use((err, req, res, next) =>
+app.use((err: Error, _req: express.Request, res: express.Response, _next: express.NextFunction) =>
   res.status(500).send({ error: err?.message, logref: 'internal-server-error' })
 )
 
-module.exports = app
+export default app

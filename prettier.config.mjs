@@ -1,14 +1,22 @@
-module.exports = {
+/** @type {import('prettier').Config} */
+export default {
   arrowParens: 'avoid',
   bracketSameLine: false,
   bracketSpacing: true,
   jsxSingleQuote: false,
-  parser: 'babel',
   printWidth: 100,
   quoteProps: 'as-needed',
   semi: false,
   singleQuote: true,
   tabWidth: 2,
   trailingComma: 'none',
-  useTabs: false
+  useTabs: false,
+  overrides: [
+    {
+      files: '*.ts',
+      options: {
+        parser: 'typescript'
+      }
+    }
+  ]
 }

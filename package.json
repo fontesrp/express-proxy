@@ -2,12 +2,14 @@
   "name": "express-proxy",
   "version": "0.0.0",
   "private": true,
+  "type": "module",
   "scripts": {
     "clean": "rm -rf node_modules package-lock.json yarn.lock",
-    "format": "prettier --write \"**/*.{js,ts}\"",
-    "lint": "eslint .",
+    "format": "prettier --write \"**/*.{js,mjs,ts,cjs}\"",
+    "lint": "eslint . && tsc --noEmit",
     "prepare": "husky",
-    "start": "DEBUG=express-proxy:* nodemon ./bin/www"
+    "start": "DEBUG=express-proxy:* nodemon ./bin/www.ts",
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "axios": "^1.18.1",
@@ -23,17 +25,31 @@
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
+    "@types/body-parser": "^1.19.6",
+    "@types/cookie-parser": "^1.4.10",
+    "@types/debug": "^4.1.13",
+    "@types/express": "^5.0.6",
+    "@types/morgan": "^1.9.10",
+    "@types/multer": "^2.2.0",
+    "@types/node": "^26.1.1",
+    "@types/qs": "^6.15.1",
     "eslint": "^10.7.0",
     "eslint-config-prettier": "^10.1.8",
     "globals": "^17.7.0",
     "husky": "^9.1.7",
     "lint-staged": "^16.4.0",
-    "prettier": "^3.9.5"
+    "prettier": "^3.9.5",
+    "typescript": "^6.0.3",
+    "typescript-eslint": "^8.64.0"
   },
   "lint-staged": {
-    "*.{js,ts}": ["prettier --write", "eslint --fix"]
+    "*.{js,mjs,ts,cjs}": [
+      "prettier --write",
+      "eslint --fix",
+      "bash -c 'tsc --noEmit' --"
+    ]
   },
   "engines": {
-    "node": ">=18.0.0"
+    "node": ">=24.0.0"
   }
 }

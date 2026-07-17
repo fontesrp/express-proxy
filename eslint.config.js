@@ -1,24 +1,22 @@
-const js = require('@eslint/js')
-const eslintConfigPrettier = require('eslint-config-prettier')
-const globals = require('globals')
+// @ts-check
 
-module.exports = [
+import { defineConfig } from 'eslint/config'
+import eslint from '@eslint/js'
+import eslintConfigPrettier from 'eslint-config-prettier'
+import globals from 'globals'
+import tseslint from 'typescript-eslint'
+
+export default defineConfig(
+  { ignores: ['node_modules/**'] },
   {
-    ignores: ['node_modules/**']
-  },
-  js.configs.recommended,
-  eslintConfigPrettier,
-  {
-    files: ['**/*.{js,ts}'],
+    files: ['**/*.{js,ts,cjs}'],
+    extends: [eslint.configs.recommended, tseslint.configs.recommended],
     languageOptions: {
-      ecmaVersion: 'latest',
-      sourceType: 'commonjs',
-      globals: {
-        ...globals.node
-      }
+      globals: globals.node
     },
     rules: {
-      'no-unused-vars': ['error', { argsIgnorePattern: '^_' }]
+      '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_' }]
     }
-  }
-]
+  },
+  eslintConfigPrettier
+)

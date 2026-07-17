@@ -1,19 +1,18 @@
-const axios = require('axios')
-const express = require('express')
-const FormData = require('form-data')
-const fs = require('fs')
-const os = require('os')
-const path = require('path')
+import axios from 'axios'
+import express, { type NextFunction, type Request, type Response } from 'express'
+import FormData from 'form-data'
+import fs from 'fs'
+import os from 'os'
+import path from 'path'
 
-const getLength = formData =>
+const getLength = (formData: FormData): Promise<number | undefined> =>
   new Promise((resolve, reject) =>
     formData.getLength((err, length) => (err ? reject(err) : resolve(length)))
   )
 
 const router = express.Router()
 
-// eslint-disable-next-line no-unused-vars
-router.post('/video', (req, res, next) => {
+router.post('/video', (req: Request, res: Response, _next: NextFunction) => {
   const { body, headers: reqHeaders, method, query, url: reqUrl } = req
 
   console.log('method', method)
@@ -55,36 +54,39 @@ router.post('/video', (req, res, next) => {
   res.status(203).send('success')
 })
 
-// eslint-disable-next-line no-unused-vars
-router.all('/*splat', (req, res, next) => {
+router.all('/*splat', (req: Request, res: Response, _next: NextFunction) => {
   const { body, headers: reqHeaders, method, query, url: reqUrl } = req
 
   const url = reqUrl.replace(/\?.*/, '')
 
-  const headers = { ...(reqHeaders || {}) }
+  const headers: Record<string, string | string[] | undefined> = { ...(reqHeaders || {}) }
 
   delete headers.host
   delete headers['user-agent']
 
-  let data = body
-  let getContentLength = Promise.resolve(headers['content-length'])
+  let data: unknown = body
+  let getContentLength: Promise<string | string[] | undefined | null> = Promise.resolve(
+    headers['content-length']
+  )
 
-  if (headers['content-type']?.startsWith?.('multipart/form-data')) {
+  if (headers['content-type']?.toString().startsWith('multipart/form-data')) {
     delete headers['content-length']
 
-    data = Object.entries(body || {}).reduce((form, [key, value]) => {
-      form.append(key, value)
+    data = Object.entries((body as Record<string, unknown>) || {}).reduce((form, [key, value]) => {
+      form.append(key, value as string | Buffer)
       return form
     }, new FormData())
 
-    Object.assign(headers, data.getHeaders())
+    Object.assign(headers, (data as FormData).getHeaders())
 
-    getContentLength = getLength(data).catch(() => null)
+    getContentLength = getLength(data as FormData).then(length =>
+      length === undefined ? null : String(length)
+    )
   }
 
-  let resData
-  let resHeaders
-  let resStatus
+  let resData: unknown
+  let resHeaders: Record<string, string | number | string[] | undefined> = {}
+  let resStatus = 203
 
   getContentLength
     .then(contentLength => {
@@ -100,15 +102,23 @@ router.all('/*splat', (req, res, next) => {
     })
     .then(response => {
       resData = response.data || {}
-      resHeaders = response.headers || {}
+      resHeaders = { ...response.headers } as Record<string, string | number | string[] | undefined>
       resStatus = response.status || 203
     })
-    .catch(error => {
-      const { response } = error || {}
-      resData = response?.data || { logref: 'All is fucked!' }
-      resHeaders = response?.headers || {}
-      resStatus = response?.status || 500
-    })
+    .catch(
+      (error: {
+        response?: {
+          data?: unknown
+          headers?: Record<string, string | number | string[] | undefined>
+          status?: number
+        }
+      }) => {
+        const { response } = error || {}
+        resData = response?.data || { logref: 'All is fucked!' }
+        resHeaders = response?.headers || {}
+        resStatus = response?.status || 500
+      }
+    )
     .finally(() => {
       delete resHeaders['transfer-encoding']
       res.set(resHeaders)
@@ -116,4 +126,4 @@ router.all('/*splat', (req, res, next) => {
     })
 })
 
-module.exports = router
+export default router

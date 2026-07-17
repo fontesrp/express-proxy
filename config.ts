@@ -1,7 +1,7 @@
-const axios = require('axios')
-const debug = require('debug')
-const os = require('os')
-const qs = require('qs')
+import axios from 'axios'
+import debug from 'debug'
+import os from 'os'
+import qs from 'qs'
 
 const log = debug('express-proxy:server')
 const warn = debug('express-proxy:warning')
@@ -21,4 +21,4 @@ axios.defaults.paramsSerializer = params =>
   qs.stringify(params, { arrayFormat: 'comma', encode: false })
 axios.defaults.timeout = 30000
 
-module.exports = { log, warn }
+export { log, warn }
